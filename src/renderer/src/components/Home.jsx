@@ -105,8 +105,8 @@ export default function Home() {
     }
 
     return (
-        <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e0f7fa', padding: '20px' }}>
-            <div className='relative' style={{ backgroundColor: '#b2ebf2', padding: '10px', borderRadius: '8px' }}>
+        <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
+            <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
                 <canvas
                     className='rounded-sm shadow-sm'
                     width={800}
