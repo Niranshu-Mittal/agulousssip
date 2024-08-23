@@ -33,6 +33,7 @@ export default function Home() {
 
         const handleMouseDown = (e) => {
             if (e.button === 0) {
+                // Close all menus when drawing or erasing starts
                 set_line_width_Menu_Active(false)
                 set_Color_Pallete_Menu_Active(false)
                 
@@ -138,19 +139,19 @@ export default function Home() {
             <div className='absolute bottom-0 flex gap-2'>
                 <ButtonGroup>
                     <Button 
-                        className='w-15 h-15' 
+                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                         onClick={toggleColorPaletteMenu}
                     >
                         <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
                     </Button>
                     <Button 
-                        className='w-15 h-15' 
+                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                         onClick={toggleLineWidthMenu}
                     >
                         <img src={line_width_icon} width={20} height={20} alt="Line Width" />
                     </Button>
                     <Button 
-                        className='w-15 h-15' 
+                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                         onClick={toggleEraserMode}
                     >
                         <img 
