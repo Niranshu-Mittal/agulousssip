@@ -33,7 +33,6 @@ export default function Home() {
 
         const handleMouseDown = (e) => {
             if (e.button === 0) {
-                // Close all menus when drawing or erasing starts
                 set_line_width_Menu_Active(false)
                 set_Color_Pallete_Menu_Active(false)
                 
