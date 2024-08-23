@@ -5,7 +5,6 @@ import color_pallete_icon from '../assets/pallete.png'
 import line_width_icon from '../assets/line_width.png'
 import eraser_icon from '../assets/eraser.png'
 import pencil_icon from '../assets/pencil.png'
-// import 'slider.css'
 import { HexColorPicker } from 'react-colorful'
 
 export default function Home() {
@@ -34,6 +33,10 @@ export default function Home() {
 
         const handleMouseDown = (e) => {
             if (e.button === 0) {
+                // Close all menus when drawing or erasing starts
+                set_line_width_Menu_Active(false)
+                set_Color_Pallete_Menu_Active(false)
+                
                 is_drawing = true
                 const { x, y } = getCanvasPosition(e)
                 context.beginPath()
@@ -102,8 +105,8 @@ export default function Home() {
     }
 
     return (
-        <div className='grid items-center justify-items-center justify-center gap-5 relative'>
-            <div className='relative'>
+        <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e0f7fa', padding: '20px' }}>
+            <div className='relative' style={{ backgroundColor: '#b2ebf2', padding: '10px', borderRadius: '8px' }}>
                 <canvas
                     className='rounded-sm shadow-sm'
                     width={800}
@@ -114,7 +117,7 @@ export default function Home() {
                 </canvas>
                 {line_width_menu_active && 
                     <Slider 
-                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2' // Position the slider above the buttons
+                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2' 
                         value={linewidth} 
                         onChange={SliderValueChangeHandler} 
                         step={1} 
@@ -123,8 +126,8 @@ export default function Home() {
                 }
                 {Color_pallete_menu_active && 
                     <div 
-                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' // Position the color picker above the buttons
-                        style={{ pointerEvents: 'auto' }} // Ensure the color picker can receive pointer events
+                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' 
+                        style={{ pointerEvents: 'auto' }} 
                     >
                         <HexColorPicker 
                             color={strokeColor} 
