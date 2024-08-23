@@ -1,111 +1,165 @@
-import React, {useContext, useEffect, useRef, useState} from 'react'
-import { ButtonGroup, Button } from '@material-tailwind/react'
+import React, { useEffect, useRef, useState } from 'react'
+import { ButtonGroup, Button, Slider } from '@material-tailwind/react'
 import icon from '../../../../resources/icon.png'
 import color_pallete_icon from '../assets/pallete.png'
 import line_width_icon from '../assets/line_width.png'
-import { Slider } from '@material-tailwind/react'
-import { storeContext } from '../context/store.context'
-// import { ColorPicker, useColor } from 'react-color-palette'
+import eraser_icon from '../assets/eraser.png'
+import pencil_icon from '../assets/pencil.png'
+// import 'slider.css'
 import { HexColorPicker } from 'react-colorful'
 
 export default function Home() {
-
-    // const {} = useContext(storeContext)
-
     const canvasRef = useRef(null)
-    const linewidthRef = useRef(1)
-    const strokecolorRef = useRef("#000000")
+    const [drawing, setDrawing] = useState(false)
+    const [strokeColor, setStrokeColor] = useState("#000000")
+    const [linewidth, setLineWidth] = useState(5)
+    const [line_width_menu_active, set_line_width_Menu_Active] = useState(false)
+    const [Color_pallete_menu_active, set_Color_Pallete_Menu_Active] = useState(false)
+    const [eraserMode, setEraserMode] = useState(false)
 
-    const [drawing,setDrawing] = useState(false)
-
-    const [strokeColor,setStrokeColor] = useState("#000000")
-
-    const [linewidth,setLineWidth] = useState(1)   //for live change both useRef and useState should be used
-
-    const [line_width_menu_active,set_line_width_Menu_Active] = useState(false)
-
-    const [Color_pallete_menu_active,set_Color_Pallete_Menu_Active] = useState(false)
-
-    useEffect(()=>{
-        /**@type {HTMLCanvasElement} */
+    useEffect(() => {
         const canvas = canvasRef.current
         const context = canvas.getContext("2d")
-
         let is_drawing = false
-        let draw_color = strokeColor
-        let line_width = linewidth
+        context.lineCap = 'round'
+        context.lineJoin = 'round'
 
-        canvas.addEventListener('mousedown',(e)=>{
-            if(e.button === 0){
+        const getCanvasPosition = (e) => {
+            const rect = canvas.getBoundingClientRect()
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            }
+        }
+
+        const handleMouseDown = (e) => {
+            if (e.button === 0) {
                 is_drawing = true
+                const { x, y } = getCanvasPosition(e)
                 context.beginPath()
-                context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop)
+                context.moveTo(x, y)
                 e.preventDefault()
             }
-        })
+        }
 
-        canvas.addEventListener('mousemove',(e)=>{
-            if(is_drawing){
-                context.lineWidth = linewidthRef.current
-                context.strokeStyle = strokecolorRef.current
-                context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop)
+        const handleMouseMove = (e) => {
+            if (is_drawing) {
+                const { x, y } = getCanvasPosition(e)
+                context.lineWidth = linewidth
+                context.strokeStyle = strokeColor
+                if (eraserMode) {
+                    context.strokeStyle = '#ffffff'
+                }
+                context.lineTo(x, y)
                 context.stroke()
             }
-            else{
-                is_drawing = false
-            }
-        })
+        }
 
-        canvas.addEventListener('mouseup',(e)=>{
+        const handleMouseUp = () => {
             is_drawing = false
-        })
+        }
 
-        canvas.addEventListener('mouseout',(e)=>{
+        const handleMouseOut = () => {
             is_drawing = false
-        })
+        }
 
-    },[linewidth,strokeColor])
+        canvas.addEventListener('mousedown', handleMouseDown)
+        canvas.addEventListener('mousemove', handleMouseMove)
+        canvas.addEventListener('mouseup', handleMouseUp)
+        canvas.addEventListener('mouseout', handleMouseOut)
 
-    
-    /**@type {HTMLCanvasElement} */
-    const SliderValueChangeHandler = (e) =>{
+        return () => {
+            canvas.removeEventListener('mousedown', handleMouseDown)
+            canvas.removeEventListener('mousemove', handleMouseMove)
+            canvas.removeEventListener('mouseup', handleMouseUp)
+            canvas.removeEventListener('mouseout', handleMouseOut)
+        }
+    }, [linewidth, strokeColor, eraserMode])
 
-        const newValue = parseInt(e.target.value)
-        
-        console.log(newValue)
+    const SliderValueChangeHandler = (e) => {
+        const newValue = parseInt(e.target.value, 10)
         setLineWidth(newValue)
-        linewidthRef.current = newValue
     }
 
-    const StrokeColorChangeHandler = (value) =>{
-
-        console.log(value)
+    const StrokeColorChangeHandler = (value) => {
         setStrokeColor(value)
-        strokecolorRef.current = value
-    
     }
 
+    const toggleLineWidthMenu = () => {
+        set_line_width_Menu_Active(!line_width_menu_active)
+        set_Color_Pallete_Menu_Active(false)
+    }
 
-  return (
-    <div className='grid items-center justify-items-center justify-center gap-5'>
+    const toggleColorPaletteMenu = () => {
+        set_Color_Pallete_Menu_Active(!Color_pallete_menu_active)
+        set_line_width_Menu_Active(false)
+    }
 
-        <div className='items-center justify-center justify-items-center'>
+    const toggleEraserMode = () => {
+        setEraserMode(!eraserMode)
+        set_line_width_Menu_Active(false)
+        set_Color_Pallete_Menu_Active(false)
+    }
 
-            <canvas className='rounded-sm shadow-sm relative' width={800} height={500}  ref={canvasRef}> 
-            </canvas>
-            {line_width_menu_active ? <Slider className='absolute w-10 left-1/2 transform -translate-x-1/2 ' value={linewidthRef.current} onChange={SliderValueChangeHandler} step={1}/> : null}
-            {Color_pallete_menu_active ? <HexColorPicker className='absolute left-1/2 transform -translate-x-1/2 z-20' color={strokecolorRef.current} onChange={StrokeColorChangeHandler}/> : null}
+    return (
+        <div className='grid items-center justify-items-center justify-center gap-5 relative'>
+            <div className='relative'>
+                <canvas
+                    className='rounded-sm shadow-sm'
+                    width={800}
+                    height={500}
+                    ref={canvasRef}
+                    style={{ backgroundColor: '#ffffff' }} 
+                >
+                </canvas>
+                {line_width_menu_active && 
+                    <Slider 
+                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2' // Position the slider above the buttons
+                        value={linewidth} 
+                        onChange={SliderValueChangeHandler} 
+                        step={1} 
+                        min={1} 
+                    />
+                }
+                {Color_pallete_menu_active && 
+                    <div 
+                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' // Position the color picker above the buttons
+                        style={{ pointerEvents: 'auto' }} // Ensure the color picker can receive pointer events
+                    >
+                        <HexColorPicker 
+                            color={strokeColor} 
+                            onChange={StrokeColorChangeHandler} 
+                        />
+                    </div>
+                }
+            </div>
+            <div className='absolute bottom-0 flex gap-2'>
+                <ButtonGroup>
+                    <Button 
+                        className='w-15 h-15' 
+                        onClick={toggleColorPaletteMenu}
+                    >
+                        <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
+                    </Button>
+                    <Button 
+                        className='w-15 h-15' 
+                        onClick={toggleLineWidthMenu}
+                    >
+                        <img src={line_width_icon} width={20} height={20} alt="Line Width" />
+                    </Button>
+                    <Button 
+                        className='w-15 h-15' 
+                        onClick={toggleEraserMode}
+                    >
+                        <img 
+                            src={eraserMode ? pencil_icon : eraser_icon} 
+                            width={20} 
+                            height={20} 
+                            alt={eraserMode ? "Pencil" : "Eraser"} 
+                        />
+                    </Button>
+                </ButtonGroup>
+            </div>
         </div>
-
-        <div className=''>
-            <ButtonGroup>
-                <Button className='w-15 h-15' onClick={()=>{set_Color_Pallete_Menu_Active(!Color_pallete_menu_active)}}><img src={color_pallete_icon} width={20} height={20}></img></Button>
-                <Button className='w-15 h-15' onClick={()=>{set_line_width_Menu_Active(!line_width_menu_active)}}><img src={line_width_icon} width={20} height={20}></img></Button>
-                <Button className='w-15 h-15'><img src={icon} width={15} height={15}></img></Button>
-            </ButtonGroup>
-        </div>
-
-
-    </div>
-  )
+    )
 }
