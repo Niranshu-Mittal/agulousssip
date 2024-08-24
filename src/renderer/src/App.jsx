@@ -7,9 +7,6 @@ function App() {
 
   return (
     <>
-      <h1 className='text-[40px] text-center'>
-        First Electron-vite-react project
-      </h1>
       <Home/>
     </>
   )

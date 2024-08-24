@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { ButtonGroup, Button, Slider } from '@material-tailwind/react'
-import icon from '../../../../resources/icon.png'
 import color_pallete_icon from '../assets/pallete.png'
 import line_width_icon from '../assets/line_width.png'
 import eraser_icon from '../assets/eraser.png'
 import pencil_icon from '../assets/pencil.png'
 import { HexColorPicker } from 'react-colorful'
+import { IoIosSave } from 'react-icons/io'
 
 export default function Home() {
     const canvasRef = useRef(null)
@@ -79,6 +79,24 @@ export default function Home() {
         }
     }, [linewidth, strokeColor, eraserMode])
 
+    const handleSave = async () => {
+        console.log('window.api:', window.api)
+        const canvas = canvasRef.current
+        const svgData = canvas.toDataURL('image/svg+xml')
+        console.log('inside handlesave')
+        if (window.electron && window.electron.ipcRenderer) {
+            const result = await window.electron.ipcRenderer.invoke('dialog:save', svgData)
+            // const result = await window.api.invoke('save-svg', svgData)
+        // const result = await window.api.invoke('save-svg', svgData)
+            if(result.success){
+                console.log('svg saved successfully.')
+            }
+            else{
+                console.log('Failed to save svg.')
+            }
+        }
+    }
+
     const SliderValueChangeHandler = (e) => {
         const newValue = parseInt(e.target.value, 10)
         setLineWidth(newValue)
@@ -105,63 +123,66 @@ export default function Home() {
     }
 
     return (
-        <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
-            <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
-                <canvas
-                    className='rounded-sm shadow-sm'
-                    width={800}
-                    height={500}
-                    ref={canvasRef}
-                    style={{ backgroundColor: '#ffffff' }} 
-                >
-                </canvas>
-                {line_width_menu_active && 
-                    <Slider 
+        <div>
+            <IoIosSave className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125' onClick={handleSave}/>
+            <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
+                <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
+                    <canvas
+                        className='rounded-sm shadow-sm'
+                        width={800}
+                        height={500}
+                        ref={canvasRef}
+                        style={{ backgroundColor: '#ffffff' }} 
+                        >
+                    </canvas>
+                    {line_width_menu_active && 
+                        <Slider 
                         className='absolute bottom-20 left-1/2 transform -translate-x-1/2' 
                         value={linewidth} 
                         onChange={SliderValueChangeHandler} 
                         step={1} 
                         min={1} 
-                    />
-                }
-                {Color_pallete_menu_active && 
-                    <div 
+                        />
+                    }
+                    {Color_pallete_menu_active && 
+                        <div 
                         className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' 
                         style={{ pointerEvents: 'auto' }} 
-                    >
-                        <HexColorPicker 
-                            color={strokeColor} 
-                            onChange={StrokeColorChangeHandler} 
-                        />
-                    </div>
-                }
-            </div>
-            <div className='absolute bottom-0 flex gap-2'>
-                <ButtonGroup>
-                    <Button 
-                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                        onClick={toggleColorPaletteMenu}
-                    >
-                        <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
-                    </Button>
-                    <Button 
-                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                        onClick={toggleLineWidthMenu}
-                    >
-                        <img src={line_width_icon} width={20} height={20} alt="Line Width" />
-                    </Button>
-                    <Button 
-                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                        onClick={toggleEraserMode}
-                    >
-                        <img 
-                            src={eraserMode ? pencil_icon : eraser_icon} 
-                            width={20} 
-                            height={20} 
-                            alt={eraserMode ? "Pencil" : "Eraser"} 
-                        />
-                    </Button>
-                </ButtonGroup>
+                        >
+                            <HexColorPicker 
+                                color={strokeColor} 
+                                onChange={StrokeColorChangeHandler} 
+                                />
+                        </div>
+                    }
+                </div>
+                <div className='absolute bottom-0 flex gap-2'>
+                    <ButtonGroup>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={toggleColorPaletteMenu}
+                            >
+                            <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={toggleLineWidthMenu}
+                            >
+                            <img src={line_width_icon} width={20} height={20} alt="Line Width" />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={toggleEraserMode}
+                            >
+                            <img 
+                                src={eraserMode ? pencil_icon : eraser_icon} 
+                                width={20} 
+                                height={20} 
+                                alt={eraserMode ? "Pencil" : "Eraser"} 
+                                />
+                        </Button>
+                    </ButtonGroup>
+                </div>
             </div>
         </div>
     )

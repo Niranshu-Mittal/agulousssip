@@ -1,8 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain, nativeImage } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import image from '../../resources/image.png'
+import fs from 'fs'
 
 function createWindow() {
   // Create the browser window.
@@ -52,6 +52,29 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+    // Handle save dialog request
+    ipcMain.handle('dialog:save', async (_,svgData) => {
+      const result = await dialog.showSaveDialog({
+        title: 'Save Canvas As SVG',
+        defaultPath: 'drawing.svg',
+        filters: [{ name: 'SVG Files', extensions: ['svg'] }]
+    })
+    console.log("result from ipcmain",result.filePath)
+  
+  
+    if(result.filePath){
+      console.log("Inside ipcmain if block.")
+      fs.writeFileSync(result.filePath, svgData)
+      return { success : true }
+    }else{
+      console.log("Inside else block",result.filePath)
+      return { success : false }
+    }
+  
+  
+    // return result.filePath
+  })
 
   createWindow()
 

@@ -8,6 +8,7 @@ const api = {}
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
 if (process.contextIsolated) {
+  console.log("Inside index.js preload if block.")
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
@@ -15,6 +16,7 @@ if (process.contextIsolated) {
     console.error(error)
   }
 } else {
+  console.log("Inside index.js preload else block.")
   window.electron = electronAPI
   window.api = api
 }
