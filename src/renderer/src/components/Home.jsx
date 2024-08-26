@@ -5,7 +5,7 @@ import line_width_icon from '../assets/line_width.png'
 import eraser_icon from '../assets/eraser.png'
 import pencil_icon from '../assets/pencil.png'
 import { HexColorPicker } from 'react-colorful'
-import { IoIosSave } from 'react-icons/io'
+import { IoIosSave, IoIosOpen } from 'react-icons/io'
 
 export default function Home() {
     const canvasRef = useRef(null)
@@ -79,23 +79,68 @@ export default function Home() {
         }
     }, [linewidth, strokeColor, eraserMode])
 
-    const handleSave = async () => {
-        console.log('window.api:', window.api)
-        const canvas = canvasRef.current
-        const svgData = canvas.toDataURL('image/svg+xml')
-        console.log('inside handlesave')
-        if (window.electron && window.electron.ipcRenderer) {
-            const result = await window.electron.ipcRenderer.invoke('dialog:save', svgData)
-            // const result = await window.api.invoke('save-svg', svgData)
-        // const result = await window.api.invoke('save-svg', svgData)
-            if(result.success){
-                console.log('svg saved successfully.')
-            }
-            else{
-                console.log('Failed to save svg.')
-            }
-        }
+    const handleSave = () => {
+        const canvas = canvasRef.current;
+    
+        // Convert canvas content to a PNG data URL
+        const imageData = canvas.toDataURL('image/png');
+    
+        // Create a Blob from the data URL
+        const blob = dataURLToBlob(imageData);
+    
+        // Create a temporary link element
+        const link = document.createElement('a');
+    
+        // Create a file name with a timestamp to avoid overwriting
+        const fileName = `drawing_${Date.now()}.png`;
+    
+        // Use the Blob URL
+        link.href = URL.createObjectURL(blob);
+    
+        // Set the download attribute with the filename
+        link.download = fileName;
+    
+        // Append the link to the document
+        document.body.appendChild(link);
+    
+        // Trigger the download
+        link.click();
+    
+        // Clean up
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
     }
+    
+    const dataURLToBlob = (dataURL) => {
+        const binary = atob(dataURL.split(',')[1]);
+        const array = [];
+        for (let i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i));
+        }
+        return new Blob([new Uint8Array(array)], { type: 'image/png' });
+    }
+    
+    
+    
+    const handleLoad = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = canvasRef.current;
+                    const context = canvas.getContext('2d');
+                    context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                    canvas.width = img.width; // Adjust canvas size to image size
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0); // Draw the image on the canvas
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const SliderValueChangeHandler = (e) => {
         const newValue = parseInt(e.target.value, 10)
@@ -124,8 +169,7 @@ export default function Home() {
 
     return (
         <div>
-            <IoIosSave className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125' onClick={handleSave}/>
-            <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
+            <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px', height: '100vh' }}>
                 <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
                     <canvas
                         className='rounded-sm shadow-sm'
@@ -133,53 +177,73 @@ export default function Home() {
                         height={500}
                         ref={canvasRef}
                         style={{ backgroundColor: '#ffffff' }} 
-                        >
+                    >
                     </canvas>
                     {line_width_menu_active && 
                         <Slider 
-                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2' 
-                        value={linewidth} 
-                        onChange={SliderValueChangeHandler} 
-                        step={1} 
-                        min={1} 
+                            className='absolute bottom-20 left-1/2 transform -translate-x-1/2' 
+                            value={linewidth} 
+                            onChange={SliderValueChangeHandler} 
+                            step={1} 
+                            min={1} 
                         />
                     }
                     {Color_pallete_menu_active && 
                         <div 
-                        className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' 
-                        style={{ pointerEvents: 'auto' }} 
+                            className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' 
+                            style={{ pointerEvents: 'auto' }} 
                         >
                             <HexColorPicker 
                                 color={strokeColor} 
                                 onChange={StrokeColorChangeHandler} 
-                                />
+                            />
                         </div>
                     }
                 </div>
+                
                 <div className='absolute bottom-0 flex gap-2'>
                     <ButtonGroup>
                         <Button 
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                             onClick={toggleColorPaletteMenu}
-                            >
+                        >
                             <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
                         </Button>
                         <Button 
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                             onClick={toggleLineWidthMenu}
-                            >
+                        >
                             <img src={line_width_icon} width={20} height={20} alt="Line Width" />
                         </Button>
                         <Button 
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                             onClick={toggleEraserMode}
-                            >
+                        >
                             <img 
                                 src={eraserMode ? pencil_icon : eraser_icon} 
                                 width={20} 
                                 height={20} 
                                 alt={eraserMode ? "Pencil" : "Eraser"} 
-                                />
+                            />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={handleSave}
+                        >
+                            <IoIosSave size={20} />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={() => document.getElementById('file-input').click()}
+                        >
+                            <IoIosOpen size={20} />
+                            <input 
+                                type="file" 
+                                id="file-input" 
+                                className='hidden' 
+                                accept="image/*" 
+                                onChange={handleLoad} 
+                            />
                         </Button>
                     </ButtonGroup>
                 </div>
