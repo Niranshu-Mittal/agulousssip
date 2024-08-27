@@ -9,6 +9,8 @@ import redo_icon from '../assets/redo.png'
 import undo_icon from '../assets/undo.png'
 import { IoIosSave, IoIosOpen } from 'react-icons/io'
 
+const MAX_STACK_SIZE = 50;
+
 export default function Home() {
     const canvasRef = useRef(null)
     const [drawing, setDrawing] = useState(false)
@@ -39,8 +41,12 @@ export default function Home() {
             if (e.button === 0) {
 
                 // Save current state to undo stack
-                setUndoStack([...undoStack, canvas.toDataURL()])
-                setRedoStack([]) // Clear redo stack
+                setUndoStack(prevStack => {
+                    const newStack = [...prevStack, canvas.toDataURL()];
+                    if (newStack.length > MAX_STACK_SIZE) newStack.shift();
+                    return newStack;
+                });
+                setRedoStack([]); // Clear redo stack
 
                 // Close all menus when drawing or erasing starts
                 set_line_width_Menu_Active(false)
@@ -76,26 +82,6 @@ export default function Home() {
             is_drawing = false
        
         }
-        const handleUndo = () => {
-            if (undoStack.length > 0) {
-                const canvas = canvasRef.current;
-                const context = canvas.getContext("2d");
-    
-                // Save current state to redo stack
-                setRedoStack([...redoStack, canvas.toDataURL()]);
-    
-                // Restore last state from undo stack
-                const lastState = undoStack.pop();
-                setUndoStack([...undoStack]); // Update undo stack
-    
-                const img = new Image();
-                img.src = lastState;
-                img.onload = () => {
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-                    context.drawImage(img, 0, 0);
-                };
-            }
-        };
 
         canvas.addEventListener('mousedown', handleMouseDown)
         canvas.addEventListener('mousemove', handleMouseMove)
@@ -116,7 +102,11 @@ export default function Home() {
             const context = canvas.getContext("2d");
 
             // Save current state to redo stack
-            setRedoStack([...redoStack, canvas.toDataURL()]);
+            setRedoStack(prevStack => {
+                const newStack = [...prevStack, canvas.toDataURL()];
+                if (newStack.length > MAX_STACK_SIZE) newStack.shift();
+                return newStack;
+            });
 
             // Restore last state from undo stack
             const lastState = undoStack.pop();
@@ -137,7 +127,11 @@ export default function Home() {
             const context = canvas.getContext("2d");
 
             // Save current state to undo stack
-            setUndoStack([...undoStack, canvas.toDataURL()]);
+            setUndoStack(prevStack => {
+                const newStack = [...prevStack, canvas.toDataURL()];
+                if (newStack.length > MAX_STACK_SIZE) newStack.shift();
+                return newStack;
+            });
 
             // Restore last state from redo stack
             const nextState = redoStack.pop();
@@ -192,8 +186,6 @@ export default function Home() {
         }
         return new Blob([new Uint8Array(array)], { type: 'image/png' });
     }
-    
-    
     
     const handleLoad = (event) => {
         const file = event.target.files[0];
