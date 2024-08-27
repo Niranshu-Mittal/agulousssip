@@ -5,6 +5,8 @@ import line_width_icon from '../assets/line_width.png'
 import eraser_icon from '../assets/eraser.png'
 import pencil_icon from '../assets/pencil.png'
 import { HexColorPicker } from 'react-colorful'
+import redo_icon from '../assets/redo.png'
+import undo_icon from '../assets/undo.png'
 import { IoIosSave, IoIosOpen } from 'react-icons/io'
 
 export default function Home() {
@@ -15,6 +17,8 @@ export default function Home() {
     const [line_width_menu_active, set_line_width_Menu_Active] = useState(false)
     const [Color_pallete_menu_active, set_Color_Pallete_Menu_Active] = useState(false)
     const [eraserMode, setEraserMode] = useState(false)
+    const [undoStack, setUndoStack] = useState([]) // Stack for undo
+    const [redoStack, setRedoStack] = useState([]) // Stack for redo
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -33,6 +37,11 @@ export default function Home() {
 
         const handleMouseDown = (e) => {
             if (e.button === 0) {
+
+                // Save current state to undo stack
+                setUndoStack([...undoStack, canvas.toDataURL()])
+                setRedoStack([]) // Clear redo stack
+
                 // Close all menus when drawing or erasing starts
                 set_line_width_Menu_Active(false)
                 set_Color_Pallete_Menu_Active(false)
@@ -47,6 +56,7 @@ export default function Home() {
 
         const handleMouseMove = (e) => {
             if (is_drawing) {
+                
                 const { x, y } = getCanvasPosition(e)
                 context.lineWidth = linewidth
                 context.strokeStyle = strokeColor
@@ -64,7 +74,28 @@ export default function Home() {
 
         const handleMouseOut = () => {
             is_drawing = false
+       
         }
+        const handleUndo = () => {
+            if (undoStack.length > 0) {
+                const canvas = canvasRef.current;
+                const context = canvas.getContext("2d");
+    
+                // Save current state to redo stack
+                setRedoStack([...redoStack, canvas.toDataURL()]);
+    
+                // Restore last state from undo stack
+                const lastState = undoStack.pop();
+                setUndoStack([...undoStack]); // Update undo stack
+    
+                const img = new Image();
+                img.src = lastState;
+                img.onload = () => {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0);
+                };
+            }
+        };
 
         canvas.addEventListener('mousedown', handleMouseDown)
         canvas.addEventListener('mousemove', handleMouseMove)
@@ -78,6 +109,48 @@ export default function Home() {
             canvas.removeEventListener('mouseout', handleMouseOut)
         }
     }, [linewidth, strokeColor, eraserMode])
+
+    const handleUndo = () => {
+        if (undoStack.length > 0) {
+            const canvas = canvasRef.current;
+            const context = canvas.getContext("2d");
+
+            // Save current state to redo stack
+            setRedoStack([...redoStack, canvas.toDataURL()]);
+
+            // Restore last state from undo stack
+            const lastState = undoStack.pop();
+            setUndoStack([...undoStack]); // Update undo stack
+
+            const img = new Image();
+            img.src = lastState;
+            img.onload = () => {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0);
+            };
+        }
+    };
+
+    const handleRedo = () => {
+        if (redoStack.length > 0) {
+            const canvas = canvasRef.current;
+            const context = canvas.getContext("2d");
+
+            // Save current state to undo stack
+            setUndoStack([...undoStack, canvas.toDataURL()]);
+
+            // Restore last state from redo stack
+            const nextState = redoStack.pop();
+            setRedoStack([...redoStack]); // Update redo stack
+
+            const img = new Image();
+            img.src = nextState;
+            img.onload = () => {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0);
+            };
+        }
+    };
 
     const handleSave = () => {
         const canvas = canvasRef.current;
@@ -201,7 +274,7 @@ export default function Home() {
                     }
                 </div>
                 
-                <div className='absolute bottom-0 flex gap-2'>
+                <div className='absolute bottom-0 flex gap-2 mb-2'>
                     <ButtonGroup>
                         <Button 
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
@@ -244,6 +317,20 @@ export default function Home() {
                                 accept="image/*" 
                                 onChange={handleLoad} 
                             />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={handleUndo}
+                        >
+                            <img src={undo_icon
+                            } width={20} height={20} alt="Undo" />
+                        </Button>
+                        <Button 
+                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                            onClick={handleRedo}
+                        >
+                            <img src={redo_icon
+                            } width={20} height={20} alt="Redo" />
                         </Button>
                     </ButtonGroup>
                 </div>
