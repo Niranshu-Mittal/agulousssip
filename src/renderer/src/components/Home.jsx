@@ -21,6 +21,7 @@ export default function Home() {
     const [eraserMode, setEraserMode] = useState(false)
     const [undoStack, setUndoStack] = useState([]) // Stack for undo
     const [redoStack, setRedoStack] = useState([]) // Stack for redo
+    const [darkMode, setDarkMode] = useState(false) // State for dark mode
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -232,16 +233,28 @@ export default function Home() {
         set_Color_Pallete_Menu_Active(false)
     }
 
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode)
+    }
+
     return (
-        <div>
-            <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px', height: '100vh' }}>
-                <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
+        <div className={darkMode ? 'dark' : ''}>
+            <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: darkMode ? '#333' : '#e1d4f1', padding: '20px', height: '100vh' }}>
+                <div className='absolute top-0 right-0 m-4'>
+                    <Button 
+                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
+                        onClick={toggleDarkMode}
+                    >
+                        {darkMode ? 'Light Mode' : 'Dark Mode'}
+                    </Button>
+                </div>
+                <div className='relative' style={{ backgroundColor: darkMode ? '#555' : '#c7b9db', padding: '10px', borderRadius: '8px' }}>
                     <canvas
                         className='rounded-sm shadow-sm'
                         width={800}
                         height={500}
                         ref={canvasRef}
-                        style={{ backgroundColor: '#ffffff' }} 
+                        style={{ backgroundColor: darkMode ? '#222' : '#ffffff' }} 
                     >
                     </canvas>
                     {line_width_menu_active && 
@@ -314,15 +327,13 @@ export default function Home() {
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                             onClick={handleUndo}
                         >
-                            <img src={undo_icon
-                            } width={20} height={20} alt="Undo" />
+                            <img src={undo_icon} width={20} height={20} alt="Undo" />
                         </Button>
                         <Button 
                             className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
                             onClick={handleRedo}
                         >
-                            <img src={redo_icon
-                            } width={20} height={20} alt="Redo" />
+                            <img src={redo_icon} width={20} height={20} alt="Redo" />
                         </Button>
                     </ButtonGroup>
                 </div>
