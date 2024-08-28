@@ -484,31 +484,31 @@ export default function Home1() {
                     }
                 </div>
                 <div className='flex gap-2'>
-                    <ButtonGroup>
-                        <Button>
-                            <PiHandTapBold className='w-7 h-7' onClick={togglePanningMode}/>
+                    <ButtonGroup clasName='absolute bottom-0 flex gap-2 mb-2'>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]'>
+                            <PiHandTapBold className='w-7 h-7' color="black" onClick={togglePanningMode}/>
                         </Button>
-                        <Button className='w-15 h-15' onClick={toggleDrawMode}>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' onClick={toggleDrawMode}>
                             <img src={pencil_icon} width={20} height={20} alt="Pencil(Draw mode on-off)"/>
                         </Button>
-                        <Button className='w-15 h-15' onClick={toggleColorPaletteMenu}>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' onClick={toggleColorPaletteMenu}>
                             <img src={color_pallete_icon} width={20} height={20} alt="Color Palette" />
                         </Button>
-                        <Button className='w-15 h-15' onClick={toggleLineWidthMenu}>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' onClick={toggleLineWidthMenu}>
                             <img src={line_width_icon} width={20} height={20} alt="Line Width" />
                         </Button>
-                        <Button className='w-15 h-15'>
-                            <IoIosUndo className='w-7 h-7' color='gray' onClick={deleteLastObject}/>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]'>
+                            <IoIosUndo className='w-7 h-7' color='Black' onClick={deleteLastObject}/>
                             {/* <img src={eraser_icon} width={20} height={20} alt={"Eraser"} onClick={deleteLastObject}/> */}
                         </Button>
-                        <Button className='w-15 h-15'>
-                            <IoIosRedo className='w-7 h-7' color='gray' onClick={BackLastDeletedObject}/>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]'>
+                            <IoIosRedo className='w-7 h-7' color='Black' onClick={BackLastDeletedObject}/>
                             {/* <img src={eraser_icon} width={20} height={20} alt={"Eraser"} onClick={deleteLastObject}/> */}
                         </Button>
-                        <Button>
-                            <Menu>
-                                <MenuHandler>
-                                    <Button>
+                        <Button className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]'>
+                            <Menu >
+                                <MenuHandler className='w-15 h-15 bg-[#9b6ae0]'>
+                                    <Button className='w-15 h-15 bg-[#9b6ae0]'>
                                         {BrushType}
                                     </Button>
                                 </MenuHandler>
