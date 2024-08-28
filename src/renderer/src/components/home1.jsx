@@ -466,6 +466,11 @@ export default function Home1() {
         fabricCanvas.freeDrawingBrush.width = lineWidth
     }
 
+    const DeactiveAllButtonHandler = () => {
+        setColorPaletteMenuActive(false)
+        setLineWidthMenuActive(false)
+    }
+
     return (
         <div className='bg-[#e1d4f1]'>
             <div className='flex justify-between'>
@@ -498,7 +503,7 @@ export default function Home1() {
                 <FaFolderOpen className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125 mr-4' onClick={handleOpen} /> */}
             </div>
             <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
-                <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
+                <div  className='relative'  onClick={DeactiveAllButtonHandler} style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
                     <canvas className='rounded-sm shadow-sm' ref={canvasRef} style={{background : 'ffffff'}}/>
                     {colorPaletteMenuActive &&
                     <div className='absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10' style={{ pointerEvents: 'auto' }}>
