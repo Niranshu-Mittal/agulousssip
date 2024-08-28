@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ButtonGroup, Button, Slider } from '@material-tailwind/react';
+import { ButtonGroup, Button, Slider, Menu, MenuHandler, MenuList, MenuItem } from '@material-tailwind/react';
 import color_pallete_icon from '../assets/pallete.png';
 import line_width_icon from '../assets/line_width.png';
 import eraser_icon from '../assets/eraser.png';
@@ -8,6 +8,7 @@ import { HexColorPicker } from 'react-colorful';
 import redo_icon from '../assets/redo.png';
 import undo_icon from '../assets/undo.png';
 import { IoIosSave, IoIosOpen } from 'react-icons/io';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 
 const MAX_STACK_SIZE = 50;
 
@@ -236,13 +237,32 @@ export default function Home() {
     return (
         <div className={darkMode ? 'dark' : ''}>
             <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: darkMode ? '#333' : '#e1d4f1', padding: '20px', height: '100vh' }}>
-                <div className='absolute top-0 right-0 m-4'>
-                    <Button 
-                        className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                        onClick={toggleDarkMode}
-                    >
-                        {darkMode ? 'Light Mode' : 'Dark Mode'}
-                    </Button>
+                <div className='absolute top-0 left-0 m-3'>
+                    <Menu>
+                        <MenuHandler>
+                            <Button className='w- h-10 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]'>
+                                <BsThreeDotsVertical size={20} />
+                            </Button>
+                        </MenuHandler>
+                        <MenuList>
+                            <MenuItem onClick={toggleDarkMode}>
+                                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                            </MenuItem>
+                            <MenuItem onClick={handleSave}>
+                                Save
+                            </MenuItem>
+                            <MenuItem onClick={() => document.getElementById('file-input').click()}>
+                                Load
+                                <input 
+                                    type="file" 
+                                    id="file-input" 
+                                    className='hidden' 
+                                    accept="image/*" 
+                                    onChange={handleLoad} 
+                                />
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
                 </div>
                 <div className='relative' style={{ backgroundColor: darkMode ? '#555' : '#c7b9db', padding: '10px', borderRadius: '8px' }}>
                     <canvas
@@ -298,25 +318,6 @@ export default function Home() {
                                 width={20} 
                                 height={20} 
                                 alt={eraserMode ? "Pencil" : "Eraser"} 
-                            />
-                        </Button>
-                        <Button 
-                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                            onClick={handleSave}
-                        >
-                            <IoIosSave size={20} />
-                        </Button>
-                        <Button 
-                            className='w-15 h-15 bg-[#9b6ae0] hover:bg-[#7d4ec7] focus:bg-[#b083ed] active:bg-[#6e3fa5]' 
-                            onClick={() => document.getElementById('file-input').click()}
-                        >
-                            <IoIosOpen size={20} />
-                            <input 
-                                type="file" 
-                                id="file-input" 
-                                className='hidden' 
-                                accept="image/*" 
-                                onChange={handleLoad} 
                             />
                         </Button>
                         <Button 
