@@ -3,6 +3,7 @@ import { ButtonGroup, Button, Slider } from '@material-tailwind/react'
 import eraser_icon from '../assets/eraser.png'
 import color_pallete_icon from '../assets/pallete.png'
 import line_width_icon from '../assets/line_width.png'
+import { BsThreeDotsVertical } from 'react-icons/bs'
 import pencil_icon from '../assets/pencil.png'
 import { HexColorPicker } from 'react-colorful'
 import { IoIosSave, IoIosOpen, IoIosUndo, IoIosRedo } from 'react-icons/io'
@@ -466,10 +467,35 @@ export default function Home1() {
     }
 
     return (
-        <div>
+        <div className='bg-[#e1d4f1]'>
             <div className='flex justify-between'>
-                <IoIosSave className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125' onClick={handleSave} />
-                <FaFolderOpen className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125 mr-4' onClick={handleOpen} />
+                <Button className='w-[63px] h-[62px] m-2 justify-center bg-[#9b6ae0]' >
+                    <Menu animate={{
+                        mount: { y: 58 },
+                        unmount: { y: 25 },
+                    }} placement='bottom-end' >
+                        <MenuHandler placement='bottom-end'>
+                            <BsThreeDotsVertical className='w-[18px] h-[18px]  '/>
+                        </MenuHandler >
+                        <MenuList>
+                            <MenuItem>DarkMode</MenuItem>
+                            <MenuItem onClick={handleSave} >
+                                <div className='flex justify-between'>
+                                    <div>Save</div>
+                                    <IoIosSave/>
+                                </div>
+                            </MenuItem>
+                            <MenuItem onClick={handleOpen}>
+                                <div className='flex justify-between'>
+                                    <div>Load</div>
+                                    <IoIosOpen/>
+                                </div>
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                </Button>
+                {/* <IoIosSave className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125' onClick={handleSave} />
+                <FaFolderOpen className='h-[50px] w-[50px] m-2 rounded-sm hover:scale-125 mr-4' onClick={handleOpen} /> */}
             </div>
             <div className='grid items-center justify-items-center justify-center gap-5 relative' style={{ backgroundColor: '#e1d4f1', padding: '20px' }}>
                 <div className='relative' style={{ backgroundColor: '#c7b9db', padding: '10px', borderRadius: '8px' }}>
