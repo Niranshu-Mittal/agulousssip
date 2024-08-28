@@ -483,7 +483,7 @@ export default function Home1() {
                             <BsThreeDotsVertical className='w-[18px] h-[18px]  '/>
                         </MenuHandler >
                         <MenuList>
-                            <MenuItem>DarkMode</MenuItem>
+                            {/* <MenuItem>DarkMode</MenuItem> */}
                             <MenuItem onClick={handleSave} >
                                 <div className='flex justify-between'>
                                     <div>Save</div>
